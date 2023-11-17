@@ -1,4 +1,4 @@
-# ChainFlow
+# Baby Wolfie Interface
 
 ## Getting started
 
