@@ -1,0 +1,42 @@
+@font-face {
+  font-family: 'Inter';
+  font-weight: 100 900;
+  font-display: block;
+  font-style: normal;
+  font-named-instance: 'Regular';
+  src: url('/fonts/Inter-roman.var.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Inter';
+  font-weight: 100 900;
+  font-display: block;
+  font-style: italic;
+  font-named-instance: 'Italic';
+  src: url('/fonts/Inter-italic.var.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: "Karma";
+  src: url("../utils/Karma\ Future.otf");
+}
+
+@font-face {
+  font-family: "Pixel";
+  src: url("../utils/VT323-Regular.ttf");
+}
+
+.bg-container {
+  background-image: url("../utils/forest_in_the_mountains.jpg");
+  background-position: center;
+  overflow: hidden;
+  background-repeat: no-repeat; 
+  background-size: cover;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#__next {
+  min-height: 100%;
+}
