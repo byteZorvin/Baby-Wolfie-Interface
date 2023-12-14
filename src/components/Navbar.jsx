@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
+import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+import { Col } from "antd";
 
 export default function Navbar({ buttonText, handleButtonClick, buttonLink }) {
     return (
@@ -15,11 +18,14 @@ export default function Navbar({ buttonText, handleButtonClick, buttonLink }) {
                     </Link>
                 </div>
                 <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-                    <button
+                    {/* <button
                         className="rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                     >
-                        Connect Wallet
-                    </button>
+                       Connect Wallet
+                    </button>  */}
+                    <Col>
+                        <WalletSelector style={{ backgroundColor: "#black" }} />
+                    </Col>
                 </div>
             </nav>
         </header>
