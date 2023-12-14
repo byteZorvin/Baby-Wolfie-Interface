@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const Footer = () => {
   return (
-    <div className="w-full py-5 text-center text-gray-800">
+    <div className="w-full py-5 text-center text-gray-800 fixed left-0 bottom-0">
       <div className="flex flex-row items-center px-10 gap-6">
         {[
           { icon: <FaTwitter />, link: "https://google.com" },
