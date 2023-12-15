@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { DAPP_ADDRESS, APTOS_FAUCET_URL, APTOS_NODE_URL, NETWORK } from "@/config/constants";
 import { AptosClient } from "aptos";
+import { Input } from "antd";
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 
