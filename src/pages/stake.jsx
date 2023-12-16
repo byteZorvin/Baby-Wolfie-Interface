@@ -1,5 +1,5 @@
 import Navbar from "@/components/Navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import babyWolfImage from "../utils/wolf.png";
 import rabbitImage from "../utils/Rabbit.png";
 import Image from "next/image";
@@ -7,13 +7,6 @@ import Footer from "@/components/Footer";
 import { AptosClient } from "aptos";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { DAPP_ADDRESS, APTOS_FAUCET_URL, APTOS_NODE_URL, NETWORK } from "@/config/constants";
-
-const content = [
-    { id: 1, value: '', name: 'Baby Wolfies love $FUR and they are eager to steal them from rabbits. You should try staking your Baby Wolf.', stakeButton: '', claim: '' },
-    { id: 2, value: babyWolfImage, name: 'Baby Wolf', stakeButton: 'Stake', claim: 'Claim FUR' },
-    { id: 3, value: rabbitImage, name: 'Rabbit', stakeButton: 'Stake', claim: 'Claim FUR' },
-    { id: 4, value: '', name: 'Rabbits generate $FUR tokens while being staked. They might become handy later on in the game', stakeButton: '' },
-]
 
 
 const Stake = () => {
@@ -23,6 +16,28 @@ const Stake = () => {
     const [amount, setAmount] = useState(1);
     const [selectedItemId, setSelectedItemId] = useState(null);
     const client = new AptosClient(APTOS_NODE_URL);
+
+    const [content, setContent] = useState([
+        { id: 1, value: '', name: '', stakeButton: '', claim: '' },
+        { id: 2, value: babyWolfImage, name: 'Baby Wolf', stakeButton: 'Stake', claim: 'Claim FUR' },
+        { id: 3, value: rabbitImage, name: 'Rabbit', stakeButton: 'Stake', claim: 'Claim FUR' },
+        { id: 4, value: '', name: 'Rabbits generate $FUR tokens while being staked. They might become handy later on in the game', stakeButton: '' },
+    ]);
+
+    useEffect(() => {
+        async function fetchBalances() {
+            const rabbitBalanceRes = await getRabbitBalance();
+            const babyWolfBalanceRes = await getBabyWolfieBalance();
+
+            setContent(prevContent => {
+                const updatedContent = [...prevContent];
+                updatedContent[0].name = `You own ${babyWolfBalanceRes[0]} Baby Wolf and ${rabbitBalanceRes[0]} Rabbit. Stake your NFTs to get rewards every cycle (24 hours)`;
+                return updatedContent;
+            });
+        }
+
+        fetchBalances();
+    }, [connected, account]);
 
     const is_connected = () => {
         if (!connected) {
@@ -122,6 +137,43 @@ const Stake = () => {
             console.error("Failed to get staking balance", e);
         }
     }
+
+    async function getRabbitBalance() {
+        is_connected();
+        try {
+            const res = await client.view({
+                function: `${DAPP_ADDRESS}::NFTCollection::get_balance_rabbit`,
+                type_arguments: [],
+                arguments: [
+                    account.address,
+                ]
+            });
+            console.log("User Rabbit Balance res", res);
+            return res;
+        }
+        catch(e) {
+            console.error("Failed to get user rabbit balance", e);
+        }
+    }
+
+    async function getBabyWolfieBalance() {
+        is_connected();
+        try {
+            const res = await client.view({
+                function: `${DAPP_ADDRESS}::NFTCollection::get_balance_baby_wolfie`,
+                type_arguments: [],
+                arguments: [
+                    account.address,
+                ]
+            });
+            console.log("User Baby Wolfie Balance res", res);
+            return res;
+        }
+        catch(e) {
+            console.error("Failed to get user baby wolfie balance", e);
+        }
+    }
+
 
     return (
         <div className="bg-container">
