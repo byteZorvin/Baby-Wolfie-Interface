@@ -40,7 +40,7 @@ const Forest = () => {
   const handleOk = () => {
     setIsModalVisible(false);
     mint_nft();
-    //getMetadata();
+    // getMetadata();
   }
 
   const handleCancel = () => {
