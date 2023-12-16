@@ -8,8 +8,8 @@ import { useWallet } from "@aptos-labs/wallet-adapter-react";
 import { DAPP_ADDRESS, APTOS_FAUCET_URL, APTOS_NODE_URL, NETWORK } from "@/config/constants";
 import { AptosClient } from "aptos";
 import { Input } from "antd";
-import { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 
 const content = [
   { id: 1, value: '', name: 'Baby Wolfies love $FUR and they are eager to steal them from rabbits. You should try staking your Baby Wolf.' },
@@ -93,7 +93,7 @@ const Forest = () => {
           <h1 className="text-6xl text-center font-headline text-[#0583d7e7]" >
             Welcome to the forest!
           </h1>
-          <p className="mt-6 text-xl text-center leading-8 text-white font-text ">
+          <p className="mt-6 text-2xl text-center leading-8 text-white font-text ">
             In Baby Wolfies, you're able to play two characters
           </p>
           <div className="py-20">
@@ -101,7 +101,7 @@ const Forest = () => {
               <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
                 {content.map((item) => (
                   <div key={item.id} className="mx-auto flex max-w-xs flex-col gap-y-4">
-                    <dt className="text-xl leading-7 text-white font-text">{item.name}</dt>
+                    <dt className="text-2xl leading-7 text-white font-text">{item.name}</dt>
                     {item.id !== 1 && item.id !== 4 &&
                       <dd>
                         <Image
