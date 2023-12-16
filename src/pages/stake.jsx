@@ -39,7 +39,9 @@ const Stake = () => {
 
             setContent(prevContent => {
                 const updatedContent = [...prevContent];
-                updatedContent[0].name = `You own ${babyWolfBalanceRes[0]} Baby Wolf and ${rabbitBalanceRes[0]} Rabbit. Stake your NFTs to get rewards every cycle (24 hours)`;
+                const rabbitBalance = rabbitBalanceRes ? rabbitBalanceRes[0] : 0;
+                const babyWolfBalance = babyWolfBalanceRes ? babyWolfBalanceRes[0] : 0;
+                updatedContent[0].name = `You own ${babyWolfBalance} Baby Wolf and ${rabbitBalance} Rabbit. Stake your NFTs to get rewards every cycle (24 hours)`;
                 return updatedContent;
             });
         }
@@ -76,7 +78,7 @@ const Stake = () => {
     // }
 
     async function getMetadata(itemId) {
-        if(!is_connected()) return;
+        if (!is_connected()) return;
         try {
             let tokenName;
             if (itemId == 2) {
@@ -119,7 +121,7 @@ const Stake = () => {
 
     async function stake_nft(itemId) {
         try {
-            if(!is_connected()) return;
+            if (!is_connected()) return;
             console.log("Staking");
             const res = await signAndSubmitTransaction(
                 {
@@ -158,7 +160,7 @@ const Stake = () => {
 
     async function unstake_nft(itemId) {
         try {
-            if(!is_connected()) return;
+            if (!is_connected()) return;
             console.log("Unstaking");
             const res = await signAndSubmitTransaction(
                 {
@@ -182,7 +184,7 @@ const Stake = () => {
     };
 
     async function getStakingBalance() {
-        if(!is_connected()) return;
+        if (!is_connected()) return;
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_staking_balance`,
@@ -201,7 +203,7 @@ const Stake = () => {
     }
 
     async function getRabbitBalance() {
-        if(!is_connected()) return;
+        if (!is_connected()) return;
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_balance_rabbit`,
@@ -219,7 +221,7 @@ const Stake = () => {
     }
 
     async function getBabyWolfieBalance() {
-        if(!is_connected()) return;
+        if (!is_connected()) return;
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_balance_baby_wolfie`,
