@@ -29,19 +29,22 @@ const Stake = () => {
         { id: 1, value: '', name: '', stakeButton: '', unstake: '' },
         { id: 2, value: babyWolfImage, name: 'Baby Wolf', stakeButton: 'Stake', unstake: 'Unstake' },
         { id: 3, value: rabbitImage, name: 'Rabbit', stakeButton: 'Stake', unstake: 'Unstake' },
-        { id: 4, value: '', name: 'Rabbits generate $FUR tokens while being staked. They might become handy later on in the game', stakeButton: '' },
+        { id: 4, value: '', name: '', stakeButton: '' },
     ]);
 
     useEffect(() => {
         async function fetchBalances() {
             const rabbitBalanceRes = await getRabbitBalance();
             const babyWolfBalanceRes = await getBabyWolfieBalance();
+            const furBalanceRes = await getFurClaimableBalance();
 
             setContent(prevContent => {
                 const updatedContent = [...prevContent];
                 const rabbitBalance = rabbitBalanceRes ? rabbitBalanceRes[0] : 0;
                 const babyWolfBalance = babyWolfBalanceRes ? babyWolfBalanceRes[0] : 0;
+                const furBalance = furBalanceRes ? furBalanceRes[0] : 0;
                 updatedContent[0].name = `You own ${babyWolfBalance} Baby Wolf and ${rabbitBalance} Rabbit. Stake your NFTs to get rewards every cycle (24 hours)`;
+                updatedContent[3].name = `You have ${furBalance} claimable FUR in your wallet`;
                 return updatedContent;
             });
         }
@@ -235,6 +238,24 @@ const Stake = () => {
         }
         catch (e) {
             console.error("Failed to get user baby wolfie balance", e);
+        }
+    }
+
+    async function getFurClaimableBalance() {
+        if(!is_connected()) return;
+        try {
+            const res = await client.view({
+                function: `${DAPP_ADDRESS}::NFTCollection::claimable_fur`,
+                type_arguments: [],
+                arguments: [
+                    account.address,
+                ]
+            });
+            console.log("Fur Claimable Balance res", res);
+            return res;
+        }
+        catch(e) {
+            console.error("Failed to get fur claimable balance", e);
         }
     }
 
