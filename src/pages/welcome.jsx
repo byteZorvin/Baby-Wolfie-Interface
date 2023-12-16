@@ -66,7 +66,7 @@ const Forest = () => {
   }
 
   async function mint_nft() {
-    is_connected();
+    if(!is_connected()) return;
     console.log(account.address);
     const res = await signAndSubmitTransaction(
       {

@@ -76,7 +76,7 @@ const Stake = () => {
     // }
 
     async function getMetadata(itemId) {
-        is_connected();
+        if(!is_connected()) return;
         try {
             let tokenName;
             if (itemId == 2) {
@@ -119,7 +119,7 @@ const Stake = () => {
 
     async function stake_nft(itemId) {
         try {
-            is_connected();
+            if(!is_connected()) return;
             console.log("Staking");
             const res = await signAndSubmitTransaction(
                 {
@@ -158,7 +158,7 @@ const Stake = () => {
 
     async function unstake_nft(itemId) {
         try {
-            is_connected();
+            if(!is_connected()) return;
             console.log("Unstaking");
             const res = await signAndSubmitTransaction(
                 {
@@ -182,7 +182,7 @@ const Stake = () => {
     };
 
     async function getStakingBalance() {
-        is_connected();
+        if(!is_connected()) return;
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_staking_balance`,
@@ -201,7 +201,7 @@ const Stake = () => {
     }
 
     async function getRabbitBalance() {
-        is_connected();
+        if(!is_connected()) return;
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_balance_rabbit`,
@@ -219,7 +219,7 @@ const Stake = () => {
     }
 
     async function getBabyWolfieBalance() {
-        is_connected();
+        if(!is_connected()) return;
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_balance_baby_wolfie`,
