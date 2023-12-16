@@ -107,10 +107,10 @@ const Forest = () => {
       </header>
       <div className="relative isolate px-6 pt-14 lg:px-8">
         <div className="mx-auto py-32 lg:py-32">
-          <h1 className="text-6xl text-center font-headline text-[#00a0fce7]" >
+          <h1 className="text-6xl text-center font-headline text-[#0583d7e7]" >
             Welcome to the forest!
           </h1>
-          <p className="mt-6 text-2xl text-center leading-8 text-gray-800 font-text ">
+          <p className="mt-6 text-xl text-center leading-8 text-white font-text ">
             In Baby Wolfies, you're able to play two characters
           </p>
           <div className="py-20">
@@ -118,7 +118,7 @@ const Forest = () => {
               <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
                 {content.map((item) => (
                   <div key={item.id} className="mx-auto flex max-w-xs flex-col gap-y-4">
-                    <dt className="text-2xl leading-7 text-gray-800 font-text">{item.name}</dt>
+                    <dt className="text-xl leading-7 text-white font-text">{item.name}</dt>
                     {item.id !== 1 && item.id !== 4 &&
                       <dd>
                         <Image

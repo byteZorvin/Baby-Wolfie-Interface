@@ -32,7 +32,7 @@ const Stake = () => {
                     <h1 className="text-6xl text-center font-headline text-[#00a0fce7]" >
                         Stake your NFT!
                     </h1>
-                    <p className="mt-6 text-lg text-center leading-8 text-gray-800 font-text">
+                    <p className="mt-6 text-xl text-center leading-8 text-white font-text">
                         In Baby Wolfies, you're able to play two characters
                     </p>
                     <div className="py-20">
@@ -40,8 +40,8 @@ const Stake = () => {
                             <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
                                 {content.map((item) => (
                                     <div key={item.id} className="mx-auto flex max-w-xs flex-col gap-y-4">
-                                        <dt className="text-xl leading-7 text-gray-800 font-text">{item.name}</dt>
-                                        <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl">
+                                        <dt className="text-xl leading-7 text-white font-text">{item.name}</dt>
+                                        <dd className="order-first text-3xl font-semibold tracking-tight text-white sm:text-5xl">
                                             {item.id !== 1 && item.id !== 4 &&
                                                 <div>
                                                      <Image

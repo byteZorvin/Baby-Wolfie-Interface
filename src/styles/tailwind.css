@@ -26,7 +26,7 @@
 }
 
 .bg-container {
-  background-image: url("../utils/forest_in_the_mountains.jpg");
+  background-image: url("../utils/bg.png");
   background-position: center;
   overflow-y: scroll;
   background-repeat: no-repeat; 
