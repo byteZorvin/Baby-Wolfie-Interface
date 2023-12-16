@@ -14,7 +14,7 @@ const content = [
 
 
 const Stake = () => {
-    const [buttonText, setButtonText] = useState('Go Back to the main menu');
+    const [buttonText, setButtonText] = useState('Go Back to the forest');
 
     const handleButtonClick = () => {
         console.log("Forest clicked")
@@ -24,12 +24,12 @@ const Stake = () => {
     return (
         <div className="bg-container">
             <header className="absolute inset-x-0 top-0 z-50">
-                <Navbar buttonText={buttonText} handleButtonClick={handleButtonClick} buttonLink="/" />
+                <Navbar buttonText={buttonText} handleButtonClick={handleButtonClick} buttonLink="/welcome" />
                 {/* <Navbar/> */}
             </header>
             <div className="relative isolate px-6 pt-14 lg:px-8">
                 <div className="mx-auto py-32 lg:py-32">
-                    <h1 className="text-6xl text-center font-headline text-[#00a0fce7]" >
+                    <h1 className="text-6xl text-center font-headline text-[#0583d7e7]" >
                         Stake your NFT!
                     </h1>
                     <p className="mt-6 text-xl text-center leading-8 text-white font-text">
