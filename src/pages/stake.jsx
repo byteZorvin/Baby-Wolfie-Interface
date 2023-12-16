@@ -21,6 +21,7 @@ const Stake = () => {
     const { account, signAndSubmitTransaction, connected } = useWallet();
     const [stakeTxn, setStakeTxn] = useState('');
     const [amount, setAmount] = useState(1);
+    const [selectedItemId, setSelectedItemId] = useState(null);
     const client = new AptosClient(APTOS_NODE_URL);
 
     const is_connected = () => {
@@ -29,13 +30,26 @@ const Stake = () => {
         }
     }
 
-    async function getMetadata() {
+    const handleStakeButtonClick = (itemId) => {
+        console.log(`Stake button clicked for item ${itemId}`);
+        setSelectedItemId(itemId);
+        stake_nft(itemId);
+    }
+
+    async function getMetadata(itemId) {
         is_connected();
         try {
+            let tokenName;
+            if (itemId == 2) {
+                tokenName = "Baby Wolfie Token";
+            }
+            else if (itemId == 3) {
+                tokenName = "Rabbit Token";
+            }
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_metadata`,
                 type_arguments: [],
-                arguments: ["Baby Wolfie Token"]
+                arguments: [tokenName]
             });
             return res;
         }
@@ -45,8 +59,8 @@ const Stake = () => {
         }
     }
 
-    async function stake() {
-        const metadata = await getMetadata();
+    async function stake(itemId) {
+        const metadata = await getMetadata(itemId);
         console.log("Metadata", metadata[0].inner);
         if (!metadata) {
             console.error("Failed to retrieve metadata. Cannot proceed with stake");
@@ -56,8 +70,7 @@ const Stake = () => {
             function: `${DAPP_ADDRESS}::NFTCollection::stake`,
             typeArguments: [],
             functionArguments: [
-                // metadata[0].inner,
-                "0xc6dfb2c9a338bc5adee257eed146554ff2ed964944ac79b018b26b65d16cb720",
+                metadata[0].inner,
                 1,
             ]
         };
@@ -65,25 +78,21 @@ const Stake = () => {
         return payload;
     }
 
-    async function stake_nft() {
+    async function stake_nft(itemId) {
         try {
             is_connected();
             console.log("Staking");
             const res = await signAndSubmitTransaction(
                 {
                     sender: account.address,
-                    data: stake(),
+                    data: await stake(itemId),
                 },
                 {
                     gas_unit_price: 100
                 }
             )
             console.log(res);
-            // if (res) {
-            //     await client.waitForTransaction(res.hash);
-            //     setStakeTxn(res.hash);
-            //     console.log(res.hash);
-            // }
+            setStakeTxn(res.hash);
         }
         catch (e) {
             console.error("Failed to stake", e);
@@ -94,6 +103,25 @@ const Stake = () => {
         console.log("Forest clicked")
         setButtonText('Enter the Forest');
     };
+
+    async function getStakingBalance() {
+        is_connected();
+        try {
+            const res = await client.view({
+                function: `${DAPP_ADDRESS}::NFTCollection::get_staking_balance`,
+                type_arguments: [],
+                arguments: [
+                    account.address,
+                    "Rabbit Token",
+                ]
+            });
+            console.log("Staking Balance res", res);
+            return res;
+        }
+        catch (e) {
+            console.error("Failed to get staking balance", e);
+        }
+    }
 
     return (
         <div className="bg-container">
@@ -109,10 +137,6 @@ const Stake = () => {
                     <p className="mt-6 text-xl text-center leading-8 text-white font-text">
                         In Baby Wolfies, you're able to play two characters
                     </p>
-                    <button className="rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-                        onClick={stake_nft}
-                    >Stake</button>
-
                     <div className="py-20">
                         <div className="mx-auto max-w-7xl px-6 lg:px-8">
                             <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-4">
@@ -134,6 +158,7 @@ const Stake = () => {
                                         </dd>
                                         {item.stakeButton && <button
                                             className="rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                                            onClick={() => handleStakeButtonClick(item.id)}
                                         >
                                             {item.stakeButton} <span aria-hidden="true">→</span>
                                         </button>}
@@ -144,6 +169,7 @@ const Stake = () => {
                                         </button>}
                                     </div>
                                 ))}
+                                {/* <button className="text-2xl text-white" onClick={getStakingBalance}>Staking balance</button> */}
                             </dl>
                         </div>
                     </div>

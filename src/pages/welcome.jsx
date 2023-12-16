@@ -40,7 +40,6 @@ const Forest = () => {
   const handleOk = () => {
     setIsModalVisible(false);
     mint_nft();
-    // getMetadata();
   }
 
   const handleCancel = () => {
@@ -54,22 +53,6 @@ const Forest = () => {
 
   async function getCollectionSupply() {
     //TODO
-  }
-
-  async function getMetadata() {
-    is_connected()
-    try {
-      // const res = await client.getAccount(account.address);
-      // const res = await client.view(DAPP_ADDRESS+"::NFTCollection::get_metadata", [], ["Baby Wolfie Token"]);
-      // const res = await client.view(DAPP_ADDRESS+"::NFTCollection::mint_cost", [1]);
-      // const res = await client.getAccountResource(account.address, DAPP_ADDRESS + "::NFTCollection::RabbitPool");
-      // const res = await client.view({function: `${DAPP_ADDRESS}::NFTCollection::baby_wolfie_token_address`, type_arguments: [], arguments: []});
-      const res = await client.view({ function: `${DAPP_ADDRESS}::NFTCollection::get_metadata`, type_arguments: [], arguments: ["Baby Wolfie Token"] });
-      console.log(res);
-    }
-    catch (e) {
-      console.log(e);
-    }
   }
 
   function mint() {
