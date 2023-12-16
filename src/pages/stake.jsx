@@ -20,6 +20,9 @@ const Stake = () => {
     const [amount, setAmount] = useState(1);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
+    const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
+    const [isUnstakeModalOpen, setIsUnstakeModalOpen] = useState(false);
+    const [modalAction, setModalAction] = useState('');
     const client = new AptosClient(APTOS_NODE_URL);
 
     const [content, setContent] = useState([
@@ -50,17 +53,27 @@ const Stake = () => {
         }
     }
 
-    const handleStakeButtonClick = (itemId) => {
-        console.log(`Stake button clicked for item ${itemId}`);
+    const showModal = (itemId, action) => {
         setSelectedItemId(itemId);
-        stake_nft(itemId);
+        setModalAction(action);
+        setIsModalVisible(true);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
     }
 
-    const handleUnstakeButtonClick = (itemId) => {
-        console.log(`Unstake button clicked for item ${itemId}`);
-        setSelectedItemId(itemId);
-        unstake_nft(itemId);
-    }
+    // const handleStakeButtonClick = (itemId) => {
+    //     console.log(`Stake button clicked for item ${itemId}`);
+    //     setSelectedItemId(itemId);
+    //     stake_nft(itemId);
+    // }
+
+    // const handleUnstakeButtonClick = (itemId) => {
+    //     console.log(`Unstake button clicked for item ${itemId}`);
+    //     setSelectedItemId(itemId);
+    //     unstake_nft(itemId);
+    // }
 
     async function getMetadata(itemId) {
         is_connected();
@@ -97,7 +110,7 @@ const Stake = () => {
             typeArguments: [],
             functionArguments: [
                 metadata[0].inner,
-                1,
+                amount,
             ]
         };
         console.log("Payload", payload);
@@ -136,7 +149,7 @@ const Stake = () => {
             typeArguments: [],
             functionArguments: [
                 metadata[0].inner,
-                1,
+                amount,
             ]
         };
         console.log("Payload", payload);
@@ -259,20 +272,92 @@ const Stake = () => {
                                         </dd>
                                         {item.stakeButton && <button
                                             className="rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-                                            // onClick={() => handleStakeButtonClick(item.id)}
-                                            onClick={() => showModal(item.id)}
+                                            onClick={() => showModal(item.id, 'stake')}
                                         >
                                             {item.stakeButton} <span aria-hidden="true">→</span>
                                         </button>}
                                         {item.unstake && <button
                                             className="rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
-                                            onClick={() => handleUnstakeButtonClick(item.id)}
+                                            onClick={() => showModal(item.id, 'unstake')}
                                         >
                                             {item.unstake} <span aria-hidden="true">→</span>
                                         </button>}
                                     </div>
                                 ))}
-                                {/* <button className="text-2xl text-white" onClick={getStakingBalance}>Staking balance</button> */}
+
+                                <Transition.Root show={isModalVisible} as={Fragment}>
+                                    <Dialog
+                                        as="div"
+                                        className="fixed inset-0 z-50 overflow-y-auto"
+                                        onClose={() => setIsModalVisible(false)}
+                                    >
+                                        <div className="min-h-screen px-4 text-center">
+                                            <Transition.Child
+                                                as={Fragment}
+                                                enter="ease-out duration-300"
+                                                enterFrom="opacity-0"
+                                                enterTo="opacity-100"
+                                                leave="ease-in duration-200"
+                                                leaveFrom="opacity-100"
+                                                leaveTo="opacity-0"
+                                            >
+                                                <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40" />
+                                            </Transition.Child>
+
+                                            <span
+                                                className="inline-block h-screen align-middle"
+                                                aria-hidden="true"
+                                            >
+                                                &#8203;
+                                            </span>
+
+                                            <Transition.Child
+                                                as={Fragment}
+                                                enter="ease-out duration-300"
+                                                enterFrom="opacity-0 scale-95"
+                                                enterTo="opacity-100 scale-100"
+                                                leave="ease-in duration-200"
+                                                leaveFrom="opacity-100 scale-100"
+                                                leaveTo="opacity-0 scale-95"
+                                            >
+                                                <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-md ">
+                                                    <h3 className="text-lg font-medium font-text leading-6 text-gray-900">
+                                                        {modalAction === 'stake' ? 'Enter amount of NFTs you want to stake' : 'Enter amount of NFTs you want to unstake'}
+                                                    </h3>
+                                                    <div className="mt-2 mb-2">
+                                                        <Input
+                                                            type="number"
+                                                            value={amount}
+                                                            onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
+                                                        />
+                                                    </div>
+                                                    <div className="bg-gray-50 px-2 py-2 gap-3 flex flex-row-reverse">
+                                                        <button
+                                                            className="rounded-md bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                                                            onClick={() => {
+                                                                setIsModalVisible(false);
+                                                                if (modalAction === 'stake') {
+                                                                    stake_nft(selectedItemId);
+                                                                } else if (modalAction === 'unstake') {
+                                                                    unstake_nft(selectedItemId);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {modalAction === 'stake' ? 'Stake' : 'Unstake'}
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="mt-3 inline-flex font-text w-full justify-center rounded-md bg-white px-3 py-2 text-lg font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                                                            onClick={handleCancel}
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </Transition.Child>
+                                        </div>
+                                    </Dialog>
+                                </Transition.Root>
                             </dl>
                         </div>
                     </div>
