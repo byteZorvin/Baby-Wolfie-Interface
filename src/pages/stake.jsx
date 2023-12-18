@@ -26,10 +26,10 @@ const Stake = () => {
     const client = new AptosClient(APTOS_NODE_URL);
 
     const [content, setContent] = useState([
-        { id: 1, value: '', name: '', stakeButton: '', unstake: '' },
-        { id: 2, value: babyWolfImage, name: 'Baby Wolf', stakeButton: 'Stake', unstake: 'Unstake' },
-        { id: 3, value: rabbitImage, name: 'Rabbit', stakeButton: 'Stake', unstake: 'Unstake' },
-        { id: 4, value: '', name: '', stakeButton: '' },
+        { id: 1, value: '', name: '', stakeButton: '', unstake: '', claim: '' },
+        { id: 2, value: babyWolfImage, name: 'Baby Wolf', stakeButton: 'Stake', unstake: 'Unstake', claim: '' },
+        { id: 3, value: rabbitImage, name: 'Rabbit', stakeButton: 'Stake', unstake: 'Unstake', claim: '' },
+        { id: 4, value: '', name: '', stakeButton: '', unstake: '', claim: 'Claim' },
     ]);
 
     useEffect(() => {
@@ -37,6 +37,7 @@ const Stake = () => {
             const rabbitBalanceRes = await getRabbitBalance();
             const babyWolfBalanceRes = await getBabyWolfieBalance();
             const furBalanceRes = await getFurClaimableBalance();
+            const stakingBalanceRes = await getStakingBalance(); 
 
             setContent(prevContent => {
                 const updatedContent = [...prevContent];
@@ -68,18 +69,6 @@ const Stake = () => {
     const handleCancel = () => {
         setIsModalVisible(false);
     }
-
-    // const handleStakeButtonClick = (itemId) => {
-    //     console.log(`Stake button clicked for item ${itemId}`);
-    //     setSelectedItemId(itemId);
-    //     stake_nft(itemId);
-    // }
-
-    // const handleUnstakeButtonClick = (itemId) => {
-    //     console.log(`Unstake button clicked for item ${itemId}`);
-    //     setSelectedItemId(itemId);
-    //     unstake_nft(itemId);
-    // }
 
     async function getMetadata(itemId) {
         if (!is_connected()) return;
@@ -246,6 +235,7 @@ const Stake = () => {
     async function getFurClaimableBalance() {
         if (!is_connected()) return;
         try {
+            const rabbitBalance = await getRabbitBalance();
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::claimable_fur`,
                 type_arguments: [],
@@ -254,13 +244,80 @@ const Stake = () => {
                 ]
             });
             console.log("Fur Claimable Balance res", res);
-            return res;
+            if(rabbitBalance[0] > 0) {
+                return res;
+            }
+            else return 0;
         }
         catch (e) {
             console.error("Failed to get fur claimable balance", e);
         }
     }
 
+    
+    async function getRabbitAddress() {
+        if (!is_connected()) return;
+        try {
+            const res = await client.view({
+                function: `${DAPP_ADDRESS}::NFTCollection::rabbit_token_address`,
+                type_arguments: [],
+                arguments: [],
+            });
+            return res[0];
+        }
+        catch(e) {
+            console.error("Failed to get rabbit address", e);
+        }
+    }
+    
+    async function getRabbitPoolAddress() {
+        if (!is_connected()) return;
+        try {
+            const rabbit_address = await getRabbitAddress();
+            console.log("Rabbit Address", rabbit_address);
+            const res = await client.view({
+                function: `${DAPP_ADDRESS}::NFTCollection::retrieve_stake_pool_address`,
+                type_arguments: [],
+                arguments: [
+                    account.address,
+                    rabbit_address,
+                ]
+            });
+            console.log("Rabbit Pool Address ", res[0]);
+            return res[0];
+        }
+        catch(e) {
+            console.error("Failed to get rabbit pool address", e);
+        }
+    }
+    
+    async function claimFurEarning() {
+        if (!is_connected()) return;
+        try {
+            const poolAddress = await getRabbitPoolAddress();
+            const payload = {
+                function: `${DAPP_ADDRESS}::NFTCollection::claim_rabbit_fur_earnings`,
+                typeArguments: [],
+                functionArguments: [
+                    poolAddress,
+                    account.address,
+                    false,
+                ]
+            };
+            const res = await signAndSubmitTransaction(
+                {
+                    data: payload,
+                },
+                {
+                    gas_unit_price: 100
+                }
+            );
+            console.log("Rabbit Fur earning", res);
+        }
+        catch(e) {
+            console.error("Failed to claim fur earnings", e);
+        }
+    }
 
     return (
         <div className="bg-container">
@@ -306,6 +363,12 @@ const Stake = () => {
                                             onClick={() => showModal(item.id, 'unstake')}
                                         >
                                             {item.unstake} <span aria-hidden="true">→</span>
+                                        </button>}
+                                        {item.claim && <button
+                                            className="mt-2 rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                                            onClick={claimFurEarning}
+                                        >
+                                            {item.claim} 
                                         </button>}
                                     </div>
                                 ))}
