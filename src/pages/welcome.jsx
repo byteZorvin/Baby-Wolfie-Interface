@@ -25,6 +25,7 @@ const Forest = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [amount, setAmount] = useState(1);
   const [collectionSupply, setCollectionSupply] = useState(0);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const client = new AptosClient(APTOS_NODE_URL);
 
   const is_connected = () => {
@@ -56,6 +57,14 @@ const Forest = () => {
     //TODO
   }
 
+  async function readEvent() {
+    const events = await client.getEventsByEventHandle(
+      account.address,
+      `${DAPP_ADDRESS}::NFTCollection::AssetMintingEvent`,
+      "asset_minting_events",
+    )
+  }
+
   function mint() {
     return {
       function: `${DAPP_ADDRESS}::NFTCollection::mint`,
@@ -67,7 +76,7 @@ const Forest = () => {
   }
 
   async function mint_nft() {
-    if(!is_connected()) return;
+    if (!is_connected()) return;
     console.log(account.address);
     const res = await signAndSubmitTransaction(
       {
@@ -81,6 +90,7 @@ const Forest = () => {
       await client.waitForTransaction(res.hash);
       setMintTxn(res.hash);
       console.log(res.hash);
+      setIsSuccessModalVisible(true);
     }
   }
 
@@ -184,6 +194,52 @@ const Forest = () => {
                           onClick={handleCancel}
                         >
                           Cancel
+                        </button>
+                      </div>
+                    </Dialog.Panel>
+                  </Transition.Child>
+                </div>
+              </div>
+            </Dialog>
+          </Transition.Root>
+
+          {/* Modal for displaying transaction successful */}
+          <Transition.Root show={isSuccessModalVisible} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={() => setIsSuccessModalVisible(false)}>
+              {/* Modal content */}
+              <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+
+              <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    enterTo="opacity-100 translate-y-0 sm:scale-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                    leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  >
+                    <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                      <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div className="sm:flex sm:items-start">
+                          <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <Dialog.Title as="h2" className="text-2xl font-text leading-6 text-gray-900">
+                              Transaction Successful
+                            </Dialog.Title>
+                            <div className="mt-2 text-lg font-text">
+                              <p>Your NFT has been minted successfully!!🎉</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button
+                          type="button"
+                          className="mt-3 inline-flex font-text w-full justify-center rounded-md bg-gray-800 px-3 py-2 text-lg text-white shadow-sm hover:bg-gray-700 sm:mt-0 sm:w-auto"
+                          onClick={() => setIsSuccessModalVisible(false)}
+                        >
+                          Close
                         </button>
                       </div>
                     </Dialog.Panel>
