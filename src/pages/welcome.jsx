@@ -59,10 +59,12 @@ const Forest = () => {
 
   async function readEvent() {
     const events = await client.getEventsByEventHandle(
-      account.address,
+      `${DAPP_ADDRESS}`,
       `${DAPP_ADDRESS}::NFTCollection::AssetMintingEvent`,
       "asset_minting_events",
-    )
+    );
+    console.log("Events", events.map((e) => e));
+    return events.map((e) => e);
   }
 
   function mint() {
@@ -90,6 +92,7 @@ const Forest = () => {
       await client.waitForTransaction(res.hash);
       setMintTxn(res.hash);
       console.log(res.hash);
+      // await readEvent();
       setIsSuccessModalVisible(true);
     }
   }

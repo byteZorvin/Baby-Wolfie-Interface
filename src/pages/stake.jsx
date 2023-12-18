@@ -20,16 +20,14 @@ const Stake = () => {
     const [amount, setAmount] = useState(1);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState(null);
-    const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
-    const [isUnstakeModalOpen, setIsUnstakeModalOpen] = useState(false);
     const [modalAction, setModalAction] = useState('');
     const client = new AptosClient(APTOS_NODE_URL);
 
     const [content, setContent] = useState([
-        { id: 1, value: '', name: '', stakeButton: '', unstake: '', claim: '' },
-        { id: 2, value: babyWolfImage, name: 'Baby Wolf', stakeButton: 'Stake', unstake: 'Unstake', claim: '' },
-        { id: 3, value: rabbitImage, name: 'Rabbit', stakeButton: 'Stake', unstake: 'Unstake', claim: '' },
-        { id: 4, value: '', name: '', stakeButton: '', unstake: '', claim: 'Claim' },
+        { id: 1, value: '', name: '', stakeButton: '', unstake: '', claim: '', stakeBalance: '' },
+        { id: 2, value: babyWolfImage, name: 'Baby Wolf', stakeButton: 'Stake', unstake: 'Unstake', claim: '', stakeBalance: '' },
+        { id: 3, value: rabbitImage, name: 'Rabbit', stakeButton: 'Stake', unstake: 'Unstake', claim: '', stakeBalance: '' },
+        { id: 4, value: '', name: '', stakeButton: '', unstake: '', claim: 'Claim', stakeBalance: '' },
     ]);
 
     useEffect(() => {
@@ -37,14 +35,19 @@ const Stake = () => {
             const rabbitBalanceRes = await getRabbitBalance();
             const babyWolfBalanceRes = await getBabyWolfieBalance();
             const furBalanceRes = await getFurClaimableBalance();
-            const stakingBalanceRes = await getStakingBalance(); 
+            const rabbitStakingBalanceRes = await getRabbitStakingBalance();
+            const babyWolfStakingBalanceRes = await getWolfStakingBalance();
 
             setContent(prevContent => {
                 const updatedContent = [...prevContent];
                 const rabbitBalance = rabbitBalanceRes ? rabbitBalanceRes[0] : 0;
                 const babyWolfBalance = babyWolfBalanceRes ? babyWolfBalanceRes[0] : 0;
                 const furBalance = furBalanceRes ? furBalanceRes[0] : 0;
+                const rabbitStakingBalance = rabbitStakingBalanceRes ? rabbitStakingBalanceRes[0] : 0;
+                const babyWolfStakingBalance = babyWolfStakingBalanceRes ? babyWolfStakingBalanceRes[0] : 0;
+
                 updatedContent[0].name = `You own ${babyWolfBalance} Baby Wolf and ${rabbitBalance} Rabbit. Stake your NFTs to get rewards every cycle (24 hours)`;
+                updatedContent[0].stakeBalance = `You have staked ${babyWolfStakingBalance} Baby Wolf and ${rabbitStakingBalance} Rabbit`;
                 updatedContent[3].name = `You have ${furBalance} claimable FUR in your wallet`;
                 return updatedContent;
             });
@@ -176,9 +179,8 @@ const Stake = () => {
         setButtonText('Enter the Forest');
     };
 
-    async function getStakingBalance() {
+    async function getRabbitStakingBalance() {
         if (!is_connected()) return;
-        console.log("Clicked")
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_staking_balance`,
@@ -188,11 +190,30 @@ const Stake = () => {
                     "Rabbit Token",
                 ]
             });
-            console.log("Staking Balance res", res);
+            console.log("Rabbit Staking Balance res", res);
             return res;
         }
         catch (e) {
             console.error("Failed to get staking balance", e);
+        }
+    }
+
+    async function getWolfStakingBalance() {
+        if (!is_connected()) return;
+        try {
+            const res = await client.view({
+                function: `${DAPP_ADDRESS}::NFTCollection::get_staking_balance`,
+                type_arguments: [],
+                arguments: [
+                    account.address,
+                    "Baby Wolfie Token",
+                ]
+            });
+            console.log("Wolf Staking Balance res", res);
+            return res;
+        }
+        catch (e) {
+            console.error("Failed to get wolf staking balance", e);
         }
     }
 
@@ -339,6 +360,7 @@ const Stake = () => {
                                 {content.map((item) => (
                                     <div key={item.id} className="mx-auto flex max-w-xs flex-col gap-y-4">
                                         <dt className="text-2xl leading-7 text-white font-text">{item.name}</dt>
+                                        <dt className="text-2xl mt-2 leading-7 text-white font-text">{item.stakeBalance}</dt>
                                         <dd className="order-first text-3xl font-semibold tracking-tight text-white sm:text-5xl">
                                             {item.id !== 1 && item.id !== 4 &&
                                                 <div>
@@ -365,7 +387,7 @@ const Stake = () => {
                                             {item.unstake} <span aria-hidden="true">→</span>
                                         </button>}
                                         {item.claim && <button
-                                            className="mt-2 rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                                            className="mt-1 rounded-xl bg-gray-800 px-3.5 py-2.5 text-lg font-text text-white shadow-sm hover:bg-black-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
                                             onClick={claimFurEarning}
                                         >
                                             {item.claim} 
