@@ -31,6 +31,7 @@ const Forest = () => {
     if (!connected) {
       alert("Please connect your wallet to play the game");
     }
+    return connected;
   }
 
   const showModal = () => {

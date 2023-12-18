@@ -56,6 +56,7 @@ const Stake = () => {
         if (!connected) {
             alert("Please connect your wallet to play the game");
         }
+        return connected;
     }
 
     const showModal = (itemId, action) => {
@@ -188,6 +189,7 @@ const Stake = () => {
 
     async function getStakingBalance() {
         if (!is_connected()) return;
+        console.log("Clicked")
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::get_staking_balance`,
@@ -242,7 +244,7 @@ const Stake = () => {
     }
 
     async function getFurClaimableBalance() {
-        if(!is_connected()) return;
+        if (!is_connected()) return;
         try {
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::claimable_fur`,
@@ -254,7 +256,7 @@ const Stake = () => {
             console.log("Fur Claimable Balance res", res);
             return res;
         }
-        catch(e) {
+        catch (e) {
             console.error("Failed to get fur claimable balance", e);
         }
     }
@@ -307,7 +309,6 @@ const Stake = () => {
                                         </button>}
                                     </div>
                                 ))}
-
                                 <Transition.Root show={isModalVisible} as={Fragment}>
                                     <Dialog
                                         as="div"

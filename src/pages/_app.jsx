@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }) {
     // new OKXWallet(),
   ];  
   return (
-    <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
+    <AptosWalletAdapterProvider plugins={wallets} autoConnect={false}>
       <Component {...pageProps} />
     </AptosWalletAdapterProvider>
   )
