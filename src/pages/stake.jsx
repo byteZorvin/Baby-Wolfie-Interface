@@ -12,6 +12,36 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 
+
+export async function getRabbitAddress(client) {
+    try {
+        const res = await client.view({
+            function: `${DAPP_ADDRESS}::NFTCollection::rabbit_token_address`,
+            type_arguments: [],
+            arguments: [],
+        });
+        return res[0];
+    }
+    catch(e) {
+        console.error("Failed to get rabbit address", e);
+    }
+}
+
+export async function getWolfieAddress(client) {
+    try {
+        const res = await client.view({
+            function: `${DAPP_ADDRESS}::NFTCollection::baby_wolfie_token_address`,
+            type_arguments: [],
+            arguments: [],
+        });
+        return res[0];
+    }
+    catch(e) {
+        console.error("Failed to get rabbit address", e);
+    }
+}
+
+
 const Stake = () => {
     const [buttonText, setButtonText] = useState('Go Back to the forest');
     const { account, signAndSubmitTransaction, connected } = useWallet();
@@ -32,6 +62,7 @@ const Stake = () => {
 
     useEffect(() => {
         async function fetchBalances() {
+            if(!is_connected()) return;
             const rabbitBalanceRes = await getRabbitBalance();
             const babyWolfBalanceRes = await getBabyWolfieBalance();
             const furBalanceRes = await getFurClaimableBalance();
@@ -42,13 +73,13 @@ const Stake = () => {
                 const updatedContent = [...prevContent];
                 const rabbitBalance = rabbitBalanceRes ? rabbitBalanceRes[0] : 0;
                 const babyWolfBalance = babyWolfBalanceRes ? babyWolfBalanceRes[0] : 0;
-                const furBalance = furBalanceRes ? furBalanceRes[0] : 0;
+                const furBalance = furBalanceRes ? Number(furBalanceRes[0])/(100000000) : 0;
                 const rabbitStakingBalance = rabbitStakingBalanceRes ? rabbitStakingBalanceRes[0] : 0;
                 const babyWolfStakingBalance = babyWolfStakingBalanceRes ? babyWolfStakingBalanceRes[0] : 0;
 
                 updatedContent[0].name = `You own ${babyWolfBalance} Baby Wolf and ${rabbitBalance} Rabbit. Stake your NFTs to get rewards every cycle (24 hours)`;
                 updatedContent[0].stakeBalance = `You have staked ${babyWolfStakingBalance} Baby Wolf and ${rabbitStakingBalance} Rabbit`;
-                updatedContent[3].name = `You have ${furBalance} claimable FUR in your wallet`;
+                updatedContent[3].name = `You have ${furBalance} claimable FUR in your stake`;
                 return updatedContent;
             });
         }
@@ -56,7 +87,7 @@ const Stake = () => {
         fetchBalances();
     }, [connected, account]);
 
-    const is_connected = () => {
+    function is_connected() {
         if (!connected) {
             alert("Please connect your wallet to play the game");
         }
@@ -130,6 +161,10 @@ const Stake = () => {
             );
             console.log(res);
             setStakeTxn(res.hash);
+            await getRabbitBalance();
+            await getBabyWolfieBalance();
+            await getRabbitStakingBalance();
+            await getWolfStakingBalance();
         }
         catch (e) {
             console.error("Failed to stake", e);
@@ -168,6 +203,10 @@ const Stake = () => {
             );
             console.log(res);
             setUnstakeTxn(res.hash);
+            await getRabbitBalance();
+            await getBabyWolfieBalance();
+            await getRabbitStakingBalance();
+            await getWolfStakingBalance();
         }
         catch (e) {
             console.error("Failed to unstake", e);
@@ -276,25 +315,10 @@ const Stake = () => {
     }
 
     
-    async function getRabbitAddress() {
-        if (!is_connected()) return;
-        try {
-            const res = await client.view({
-                function: `${DAPP_ADDRESS}::NFTCollection::rabbit_token_address`,
-                type_arguments: [],
-                arguments: [],
-            });
-            return res[0];
-        }
-        catch(e) {
-            console.error("Failed to get rabbit address", e);
-        }
-    }
-    
     async function getRabbitPoolAddress() {
         if (!is_connected()) return;
         try {
-            const rabbit_address = await getRabbitAddress();
+            const rabbit_address = await getRabbitAddress(client);
             console.log("Rabbit Address", rabbit_address);
             const res = await client.view({
                 function: `${DAPP_ADDRESS}::NFTCollection::retrieve_stake_pool_address`,
@@ -334,6 +358,7 @@ const Stake = () => {
                 }
             );
             console.log("Rabbit Fur earning", res);
+            await getFurClaimableBalance();
         }
         catch(e) {
             console.error("Failed to claim fur earnings", e);
@@ -352,7 +377,7 @@ const Stake = () => {
                         Stake your NFT!
                     </h1>
                     <p className="mt-6 text-2xl text-center leading-8 text-white font-text">
-                        In Baby Wolfies, you're able to play two characters
+                        In Baby Wolfies, you&apos;re able to play two characters
                     </p>
                     <div className="py-20">
                         <div className="mx-auto max-w-7xl px-6 lg:px-8">

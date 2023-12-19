@@ -10,6 +10,7 @@ import { AptosClient } from "aptos";
 import { Input } from "antd";
 import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
+import { getRabbitAddress, getWolfieAddress } from "./stake";
 
 const content = [
   { id: 1, value: '', name: 'Baby Wolfies love $FUR and they are eager to steal them from rabbits. You should try staking your Baby Wolf.' },
@@ -28,7 +29,7 @@ const Forest = () => {
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const client = new AptosClient(APTOS_NODE_URL);
 
-  const is_connected = () => {
+  function is_connected () {
     if (!connected) {
       alert("Please connect your wallet to play the game");
     }
@@ -57,14 +58,18 @@ const Forest = () => {
     //TODO
   }
 
-  async function readEvent() {
+  async function readEvent(limit, type) {
     const events = await client.getEventsByEventHandle(
-      `${DAPP_ADDRESS}`,
-      `${DAPP_ADDRESS}::NFTCollection::AssetMintingEvent`,
-      "asset_minting_events",
+      `${account.address}`,
+      `${DAPP_ADDRESS}::NFTCollection::Events`,
+      type,
+      {
+        limit
+      }
     );
-    console.log("Events", events.map((e) => e));
-    return events.map((e) => e);
+
+    console.log("Events", events);
+    return events;
   }
 
   function mint() {
@@ -80,20 +85,33 @@ const Forest = () => {
   async function mint_nft() {
     if (!is_connected()) return;
     console.log(account.address);
-    const res = await signAndSubmitTransaction(
-      {
-        data: mint(),
-      },
-      {
-        gas_unit_price: 100
+    try {
+      const res = await signAndSubmitTransaction(
+        {
+          data: mint(),
+        },
+        {
+          gas_unit_price: 100
+        }
+      )
+      if (res) {
+        await client.waitForTransaction(res.hash);
+          setMintTxn(res.hash);
+          console.log(res.hash);
+          setIsSuccessModalVisible(true);
       }
-    )
-    if (res) {
-      await client.waitForTransaction(res.hash);
-      setMintTxn(res.hash);
-      console.log(res.hash);
-      // await readEvent();
-      setIsSuccessModalVisible(true);
+      const rabbit_address = await getRabbitAddress(client);
+      const wolfie_address = await getWolfieAddress(client);
+      const events = await readEvent(2, "asset_minting_events");
+
+      let rabbit_minted = 0, wolfie_minted = 0;
+      events.forEach(event => {
+        event.data.asset_minted == rabbit_address ? rabbit_minted++ : null;
+        event.data.asset_minted == wolfie_address ? wolfie_minted++ : null;
+      });
+      console.log(rabbit_minted, wolfie_minted);
+    } catch(e) {
+      console.log("Could not mint due to: ", e);
     }
   }
 
@@ -108,7 +126,7 @@ const Forest = () => {
             Welcome to the forest!
           </h1>
           <p className="mt-6 text-2xl text-center leading-8 text-white font-text ">
-            In Baby Wolfies, you're able to play two characters
+            In Baby Wolfies, you&apos;re able to play two characters
           </p>
           <div className="py-20">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
