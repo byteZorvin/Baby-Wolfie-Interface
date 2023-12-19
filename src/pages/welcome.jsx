@@ -257,9 +257,9 @@ const Forest = () => {
                               Transaction Successful
                             </Dialog.Title>
                             <div className="mt-2 text-lg font-text">
-                              {rabbitMinted>0 && babyWolfieMinted> 0 && <p>You have successfully minted {rabbitMinted} rabbits and {babyWolfieMinted} baby wolfies!!🎉</p>}
-                              {rabbitMinted>0 && <p>You have successfully minted {rabbitMinted} rabbits!!🎉</p>}
-                              {babyWolfieMinted>0 && <p>You have successfully minted {babyWolfieMinted} baby wolfies!!🎉</p>}
+                              {rabbitMinted>0 && babyWolfieMinted> 0 && <p>You have successfully minted {rabbitMinted} rabbit {rabbitMinted > 1 ? 's' : ''} and {babyWolfieMinted} baby wolfie {babyWolfieMinted > 1 ? 's' : ''}!!🎉</p>}
+                              {rabbitMinted>0 && <p>You have successfully minted {rabbitMinted} rabbit {rabbitMinted > 1 ? 's' : ''} !!🎉</p>}
+                              {babyWolfieMinted>0 && <p>You have successfully minted {babyWolfieMinted} baby wolfie {babyWolfieMinted > 1 ? 's' : ''}!!🎉</p>}
                             </div>
                           </div>
                         </div>
