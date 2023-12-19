@@ -88,6 +88,8 @@ const Forest = () => {
     if (!is_connected()) return;
     console.log(account.address);
     try {
+      const rabbit_address = await getRabbitAddress(client);
+      const wolfie_address = await getWolfieAddress(client);
       const res = await signAndSubmitTransaction(
         {
           data: mint(),
@@ -106,10 +108,7 @@ const Forest = () => {
           console.log(res.hash);
           setIsSuccessModalVisible(true);
       }
-      const rabbit_address = await getRabbitAddress(client);
-      const wolfie_address = await getWolfieAddress(client);
       const events = await readEvent(amount, "asset_minting_events");
-
       let rabbit_minted = 0, wolfie_minted = 0;
       events.forEach(event => {
         event.data.asset_minted == rabbit_address ? rabbit_minted++ : null;
