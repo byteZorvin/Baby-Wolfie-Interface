@@ -108,7 +108,7 @@ const Forest = () => {
       }
       const rabbit_address = await getRabbitAddress(client);
       const wolfie_address = await getWolfieAddress(client);
-      const events = await readEvent(2, "asset_minting_events");
+      const events = await readEvent(amount, "asset_minting_events");
 
       let rabbit_minted = 0, wolfie_minted = 0;
       events.forEach(event => {
