@@ -28,6 +28,8 @@ const Forest = () => {
   const [collectionSupply, setCollectionSupply] = useState(0);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const client = new AptosClient(APTOS_NODE_URL);
+  const [rabbitMinted, setRabbitMinted] = useState();
+  const [babyWolfieMinted, setBabyWolfieMinted] = useState();
 
   function is_connected () {
     if (!connected) {
@@ -97,6 +99,10 @@ const Forest = () => {
       if (res) {
         await client.waitForTransaction(res.hash);
           setMintTxn(res.hash);
+          setMintTxn(res.hash);
+          console.log(res.hash);
+          setIsSuccessModalVisible(true);
+        setMintTxn(res.hash);
           console.log(res.hash);
           setIsSuccessModalVisible(true);
       }
@@ -110,6 +116,9 @@ const Forest = () => {
         event.data.asset_minted == wolfie_address ? wolfie_minted++ : null;
       });
       console.log(rabbit_minted, wolfie_minted);
+      setBabyWolfieMinted(wolfie_minted);
+      setRabbitMinted(rabbit_minted);
+      setIsSuccessModalVisible(true);
     } catch(e) {
       console.log("Could not mint due to: ", e);
     }
@@ -249,7 +258,9 @@ const Forest = () => {
                               Transaction Successful
                             </Dialog.Title>
                             <div className="mt-2 text-lg font-text">
-                              <p>Your NFT has been minted successfully!!🎉</p>
+                              {rabbitMinted>0 && babyWolfieMinted> 0 && <p>You have successfully minted ${rabbitMinted} rabbits and ${babyWolfieMinted} baby wolfies!!🎉</p>}
+                              {rabbitMinted>0 && <p>You have successfully minted ${rabbitMinted} rabbits!!🎉</p>}
+                              {babyWolfieMinted>0 && <p>You have successfully minted ${babyWolfieMinted} baby wolfies!!🎉</p>}
                             </div>
                           </div>
                         </div>
