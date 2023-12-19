@@ -62,7 +62,7 @@ const Forest = () => {
 
   async function readEvent(limit, type) {
     const events = await client.getEventsByEventHandle(
-      `${account.address}`,
+      `${DAPP_ADDRESS}`,
       `${DAPP_ADDRESS}::NFTCollection::Events`,
       type,
       {
